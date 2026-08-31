@@ -1,28 +1,11 @@
-```python
-"""
-SHHS EEG data loading utilities.
-
-This module will contain functions for:
-- Reading SHHS EDF recordings
-- Listing available signals
-- Selecting a single EEG channel
-- Loading signal data for analysis
-"""
-
 from pathlib import Path
 
 import mne
 
 
 def inspect_edf(edf_path: str | Path) -> None:
-    """
-    Print basic information about an SHHS EDF recording.
+    """Inspect an SHHS EDF recording."""
 
-    Parameters
-    ----------
-    edf_path:
-        Path to the EDF recording.
-    """
     edf_path = Path(edf_path)
 
     if not edf_path.exists():
@@ -34,17 +17,49 @@ def inspect_edf(edf_path: str | Path) -> None:
         verbose=False,
     )
 
-    print("\n=== EDF Information ===")
+    print("\n========== SHHS EDF INFORMATION ==========")
     print(f"File: {edf_path.name}")
-    print(f"Channels: {len(raw.ch_names)}")
+    print(f"Number of channels: {len(raw.ch_names)}")
     print(f"Sampling frequency: {raw.info['sfreq']} Hz")
-    print(f"Duration: {raw.times[-1]:.2f} seconds")
+    print(f"Duration: {raw.times[-1] / 3600:.2f} hours")
+    print(f"Number of samples: {raw.n_times}")
 
-    print("\n=== Available Channels ===")
-    for index, channel in enumerate(raw.ch_names):
-        print(f"{index:02d}: {channel}")
+    print("\n========== CHANNELS ==========")
+
+    for i, channel in enumerate(raw.ch_names):
+        print(f"{i:02d}: {channel}")
+
+    print("\n========== EEG CHANNEL METADATA ==========")
+
+    eeg_channels = ["EEG", "EEG(sec)"]
+
+    for channel in eeg_channels:
+
+        if channel not in raw.ch_names:
+            print(f"{channel}: NOT FOUND")
+            continue
+
+        index = raw.ch_names.index(channel)
+        channel_info = raw.info["chs"][index]
+
+        print(f"\nChannel: {channel}")
+        print(f"Index: {index}")
+        print(f"Sampling frequency: {raw.info['sfreq']} Hz")
+        print(f"Unit: {channel_info['unit']}")
+        print(f"Unit multiplier: {channel_info['unit_mul']}")
+        print(f"Calibration: {channel_info['cal']}")
 
 
 if __name__ == "__main__":
-    print("SHHS EDF loader ready.")
-```
+
+    edf_file = (
+        Path("data")
+        / "raw"
+        / "shhs"
+        / "polysomnography"
+        / "edfs"
+        / "shhs1"
+        / "shhs1-200001.edf"
+    )
+
+    inspect_edf(edf_file)
