@@ -24,7 +24,7 @@ The framework is intended to provide both:
 
 1\. Automated sleep-event predictions from a single EEG signal.
 
-2\. Explainable outputs that help identify the EEG regions contributing to model predictions.
+2\. Explainable outputs that helps to identify the EEG regions contributing to model predictions.
 
 
 
